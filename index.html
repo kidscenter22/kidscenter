@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kids center  </title>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f4f7f6;
+            overflow-x: hidden;
+            position: relative;
+            color: #333;
+        }
+
+        /* ================= BACKGROUND ================= */
+        .bg-numbers {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .bg-numbers span {
+            position: absolute;
+            top: -100px;
+            font-size: 40px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.04);
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ================= PAGES ================= */
+        .page {
+            display: none !important;
+            width: 100%;
+            min-height: 100vh;
+            animation: fade .4s ease-out;
+        }
+
+        .active-page {
+            display: flex !important;
+        }
+
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= LOGIN ================= */
+        #loginPage {
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+
+        .login-box {
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 35px;
+            border-radius: 25px;
+            background: white;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .login-box h1 {
+            margin-bottom: 25px;
+            font-size: 36px;
+            color: #1e3c72;
+            letter-spacing: 1px;
+        }
+
+        .login-box input {
+            width: 100%;
+            height: 55px;
+            padding: 0 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 2px solid #e1e8ed;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .login-box input:focus { border-color: #2a5298; }
+
+        .login-box button {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-login { background: #2a5298; color: white; }
+        .btn-login:hover { background: #1e3c72; }
+        .btn-signup { background: #e1e8ed; color: #333; }
+        .btn-signup:hover { background: #d1d8dd; }
+
+        /* ================= NAVBAR ================= */
+        .navbar {
+            width: 90%;
+            max-width: 1300px;
+            height: 80px;
+            margin: 25px auto;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .desktop-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .desktop-menu button,
+        .mobile-menu button {
+            border: none;
+            background: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .desktop-menu button:hover { color: #1e3c72; }
+
+        .coins-box {
+            padding: 8px 16px;
+            background: #ffb300;
+            color: #fff;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(255, 179, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-rank-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            font-weight: bold;
+            border: 1px solid #eee;
+        }
+
+        .logout-btn {
+            background: #e63946 !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 12px;
+        }
+        .logout-btn:hover { background: #cc2e3b !important; }
+
+        /* ================= MENU MOBILE ================= */
+        .menu {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .menu span {
+            width: 28px;
+            height: 3px;
+            background: #333;
+            border-radius: 5px;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 95px;
+            right: 0;
+            width: 240px;
+            padding: 25px;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            flex-direction: column;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .mobile-menu.active { display: flex; }
+
+        /* ================= PANELS ================= */
+        #mainPage, #sorobanPage, #guidePage { flex-direction: column; align-items: center; }
+        .container { width: 95%; max-width: 1400px; padding-bottom: 60px; }
+
+        .title {
+            text-align: center;
+            font-size: 44px;
+            margin: 35px 0;
+            color: #1e3c72;
+            font-weight: 800;
+        }
+
+        .cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+
+        .card {
+            width: 310px;
+            padding: 25px;
+            border-radius: 24px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); }
+
+        .card h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2a5298;
+            font-size: 20px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question { margin-bottom: 15px; }
+        .question p { margin-bottom: 6px; font-weight: 600; color: #666; font-size: 13px;}
+        .question input {
+            width: 100%;
+            height: 45px;
+            padding: 0 12px;
+            border-radius: 10px;
+            border: 2px solid #e1e8ed;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .start-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+
+        .start-btn {
+            width: 220px;
+            height: 55px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.3);
+            transition: 0.3s;
+        }
+        .start-btn:hover { transform: scale(1.03); }
+
+        .inline-back-btn {
+            display: block;
+            margin: 30px auto 0 auto;
+            width: 180px;
+            height: 45px;
+            border: 2px solid #333;
+            background: transparent;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .inline-back-btn:hover { background: #333; color: white; }
+
+        /* ================= SCORE GUIDE STYLES ================= */
+        .guide-box {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+        .guide-box h3 { color: #1e3c72; margin-bottom: 15px; font-size: 24px; border-bottom: 2px solid #edf2f7; padding-bottom: 8px;}
+        .guide-box p { font-size: 16px; line-height: 1.6; color: #555; margin-bottom: 25px; }
+        
+        .guide-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            text-align: left;
+            margin-bottom: 35px;
+        }
+        .guide-table th, .guide-table td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .guide-table th { background: #f8fafc; color: #2a5298; font-weight: 700; }
+        .guide-table tr:hover { background: #fafafa; }
+
+        .example-section {
+            background: #f8fafc;
+            border-left: 5px solid #2a5298;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .example-section h4 { color: #2a5298; margin-bottom: 8px; font-size: 18px; }
+        .example-section code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; font-weight: bold; }
+
+        /* ================= TIMER ================= */
+        .timer-box {
+            width: 180px;
+            height: 50px;
+            border-radius: 12px;
+            background: #e63946;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 auto 30px auto;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        /* ================= PROFILE PAGE ================= */
+        #profilePage { flex-direction: column; align-items: center; }
+
+        .profile-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        .profile-card {
+            width: 90%;
+            max-width: 480px;
+            padding: 40px 35px;
+            border-radius: 30px;
+            background: white;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .rank-trophy-icon {
+            font-size: 80px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));
+        }
+
+        .profile-card h2 { font-size: 38px; margin-bottom: 15px; font-weight: 800; }
+
+        .profile-progress {
+            width: 100%;
+            height: 16px;
+            background: #f0f2f5;
+            border-radius: 50px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .profile-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ffb300, #ff8f00);
+            border-radius: 50px;
+            transition: 1s ease-in-out;
+        }
+
+        #profileNextRank { font-size: 16px; font-weight: 600; color: #777; margin-bottom: 30px; }
+
+        .profile-info-row {
+            width: 100%;
+            padding: 15px 20px;
+            background: #f8fafc;
+            border: 1px solid #edf2f7;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .profile-btn {
+            width: 100%;
+            height: 55px;
+            border: none;
+            border-radius: 14px;
+            background: #333;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+        .profile-btn:hover { background: #000; }
+
+        /* ================= QUIZ UI ================= */
+        #quizPage { justify-content: center; align-items: center; }
+
+        .quiz-container {
+            width: 90%;
+            max-width: 650px;
+            padding: 45px;
+            border-radius: 30px;
+            background: white;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .vertical-question {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .vertical-question div {
+            width: 250px;
+            text-align: right;
+            font-size: 52px;
+            font-weight: 700;
+            padding-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .vertical-question div:last-child {
+            border-bottom: 4px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .horizontal-question {
+            font-size: 58px;
+            font-weight: 800;
+            margin-bottom: 35px;
+            color: #2a5298;
+        }
+
+        .answer-input {
+            width: 100%;
+            height: 65px;
+            padding: 0 15px;
+            border-radius: 14px;
+            border: 2px solid #cbd5e1;
+            font-size: 26px;
+            text-align: center;
+            outline: none;
+            font-weight: bold;
+        }
+        .answer-input:focus { border-color: #2a5298; }
+
+        .next-btn {
+            width: 100%;
+            height: 55px;
+            border: none;
+            border-radius: 14px;
+            background: #2a5298;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: 0.3s;
+        }
+        .next-btn:hover { background: #1e3c72; }
+
+        /* ================= RESULT ================= */
+        #resultPage { justify-content: center; align-items: center; }
+        .result-container {
+            width: 90%;
+            max-width: 600px;
+            padding: 50px;
+            border-radius: 30px;
+            background: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .result-text { font-size: 38px; font-weight: 800; margin-bottom: 30px; color: #1e3c72; line-height: 1.4; }
+
+        /* ================= LEADERBOARD ================= */
+        #leaderboardPage { flex-direction: column; align-items: center; }
+        .leaderboard-container { width: 90%; max-width: 800px; margin-top: 30px; }
+
+        .top-player {
+            padding: 18px 25px;
+            margin-bottom: 15px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #edf2f7;
+        }
+
+        .player-identity { display: flex; align-items: center; gap: 15px; }
+        .player-rank { font-size: 24px; font-weight: 800; color: #777; width: 40px; }
+        .player-name { font-size: 20px; font-weight: 700; color: #333; }
+        .player-coins { font-size: 18px; font-weight: 700; color: #ff9f43; }
+
+        .back-btn {
+            margin: 30px 0 50px 0;
+            width: 200px;
+            height: 50px;
+            border: none;
+            border-radius: 12px;
+            background: #333;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .rank-Bronze { color: #cd7f32; }
+        .rank-Silver { color: #c0c0c0; }
+        .rank-Gold { color: #ffd700; }
+        .rank-Diamond { color: #00bfff; }
+        .rank-Master { color: #ff007f; }
+        .rank-Legend { color: #9400d3; }
+
+        @media(max-width: 768px) {
+            .navbar { width: 95%; padding: 0 10px; height: 70px; margin: 15px auto; }
+            .logo { font-size: 18px; }
+            .desktop-menu { display: none; }
+            .menu { display: flex; }
+            .mobile-menu { width: 220px; top: 80px; }
+            .title { font-size: 32px; }
+            .card { width: 100%; }
+            .vertical-question div { font-size: 40px; width: 160px; }
+            .horizontal-question { font-size: 40px; }
+            .answer-input { height: 55px; font-size: 22px; }
+            .top-player { flex-direction: column; gap: 10px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BACKGROUND NUMBERS -->
+    <div class="bg-numbers">
+        <span style="left:5%;animation-duration:12s;">1</span>
+        <span style="left:18%;animation-duration:15s;">8</span>
+        <span style="left:28%;animation-duration:11s;">5</span>
+        <span style="left:40%;animation-duration:19s;">9</span>
+        <span style="left:52%;animation-duration:14s;">3</span>
+        <span style="left:68%;animation-duration:17s;">7</span>
+        <span style="left:80%;animation-duration:13s;">4</span>
+        <span style="left:92%;animation-duration:16s;">6</span>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div class="page active-page" id="loginPage">
+        <div class="login-box">
+            <h1>WELCOME</h1>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button class="btn-login" onclick="login()">Login</button>
+            <button class="btn-signup" onclick="signup()">Create Account</button>
+        </div>
+    </div>
+
+    <!-- MAIN PAGE -->
+    <div class="page" id="mainPage">
+        <nav class="navbar">
+            <div class="logo">kidc center</div>
+            <div class="desktop-menu">
+                <button onclick="openProfile()">Profile</button>
+                <button onclick="showPage('mainPage')">Competition</button>
+                <button onclick="showPage('sorobanPage')">Soroban Academy</button>
+                <button onclick="showPage('guidePage')">Score Guide</button>
+                <button onclick="openLeaderboard()">Leaderboard</button>
+
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="coins-box">🪙 Coins: <span id="coinsCount">0</span></div>
+                    <div class="badge-rank-nav">
+                        <span id="rankIcon" class="rank-Bronze">🏆</span>
+                        <span id="rankName">Bronze</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="menu" id="menuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="mobile-menu" id="mobileMenu">
+                <button onclick="showPage('mainPage')">Competition</button>
+                <button onclick="showPage('sorobanPage')">Soroban Academy</button>
+                <button onclick="showPage('guidePage')">Score Guide</button>
+                <button onclick="openLeaderboard()">Leaderboard</button>
+                <button onclick="openProfile()">Profile</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <h1 class="title">Competition</h1>
+            <div class="cards">
+                <!-- 1. Addition & Subtraction -->
+                <div class="card">
+                    <h2>Addition & Subtraction</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="addQuestions" value="5">
+                    </div>
+                    <div class="question">
+                        <p>How Many Digits?</p>
+                        <input type="number" id="addDigits" value="2">
+                    </div>
+                    <div class="question">
+                        <p>How Many Rows?</p>
+                        <input type="number" id="addRows" value="3">
+                    </div>
+                </div>
+
+                <!-- 2. Decimal Addition & Subtraction -->
+                <div class="card">
+                    <h2>Decimal Add & Sub</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="decQuestions" value="0">
+                    </div>
+                    <div class="question">
+                        <p>Total Digits (Whole + Dec)</p>
+                        <input type="number" id="decDigits" value="3">
+                    </div>
+                    <div class="question">
+                        <p>Decimal Places (الكسر)</p>
+                        <input type="number" id="decPlaces" value="1">
+                    </div>
+                    <div class="question">
+                        <p>How Many Rows?</p>
+                        <input type="number" id="decRows" value="3">
+                    </div>
+                </div>
+
+                <!-- 3. Multiplication -->
+                <div class="card">
+                    <h2>Multiplication</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="mulQuestions" value="0">
+                    </div>
+                    <div class="question">
+                        <p>First Number Digits</p>
+                        <input type="number" id="mulDigit1" value="2">
+                    </div>
+                    <div class="question">
+                        <p>Second Number Digits</p>
+                        <input type="number" id="mulDigit2" value="1">
+                    </div>
+                </div>
+
+                <!-- 4. Division -->
+                <div class="card">
+                    <h2>Division</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="divQuestions" value="0">
+                    </div>
+                    <div class="question">
+                        <p>First Number Digits</p>
+                        <input type="number" id="divDigit1" value="2">
+                    </div>
+                    <div class="question">
+                        <p>Second Number Digits</p>
+                        <input type="number" id="divDigit2" value="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="start-box">
+                <input type="number" id="quizTime" style="width:140px;height:55px;border-radius:14px;border:2px solid #cbd5e1;padding:0 15px;font-size:18px;text-align:center;" value="2">
+                <button class="start-btn" onclick="startQuiz(false)">Start Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOROBAN ACADEMY PAGE -->
+    <div class="page" id="sorobanPage">
+        <div class="container">
+            <h1 class="title">🧮 Soroban Academy</h1>
+            <p style="text-align:center; color:#666; margin-bottom:30px; font-weight:600;">Training Mode: This page is for practice and does not award coins.</p>
+            <div class="cards">
+                <!-- Card 1: Direct Arithmetic -->
+                <div class="card">
+                    <h2>Direct Arithmetic</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="sorDirectQuestions" value="5">
+                    </div>
+                    <div class="question">
+                        <p>How Many Rows?</p>
+                        <input type="number" id="sorDirectRows" value="3">
+                    </div>
+                    <button class="next-btn" style="margin-top:20px;" onclick="startSorobanTraining('direct')">Train Direct</button>
+                </div>
+
+                <!-- Card 2: Small Friends -->
+                <div class="card">
+                    <h2>Small Friends (Base 5)</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="sorSmallQuestions" value="5">
+                    </div>
+                    <div class="question">
+                        <p>How Many Rows?</p>
+                        <input type="number" id="sorSmallRows" value="3">
+                    </div>
+                    <button class="next-btn" style="margin-top:20px; background:#ff8f00;" onclick="startSorobanTraining('small')">Train Small Friends</button>
+                </div>
+
+                <!-- Card 3: Big Friends -->
+                <div class="card">
+                    <h2>Big Friends (Base 10)</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="sorBigQuestions" value="5">
+                    </div>
+                    <div class="question">
+                        <p>How Many Rows?</p>
+                        <input type="number" id="sorBigRows" value="3">
+                    </div>
+                    <button class="next-btn" style="margin-top:20px; background:#10b981;" onclick="startSorobanTraining('big')">Train Big Friends</button>
+                </div>
+            </div>
+            <button class="inline-back-btn" onclick="showPage('mainPage')">🔙 Back to Home</button>
+        </div>
+    </div>
+
+    <!-- SCORE GUIDE PAGE -->
+    <div class="page" id="guidePage">
+        <div class="container" style="max-width:900px;">
+            <h1 class="title">📊 Score System Guide</h1>
+            <div class="guide-box">
+                <h3>How Coins are Calculated?</h3>
+                <p>Our intelligent system evaluates the exact mathematical weight and complexity of every single question generated. Harder question types and deeper parameters grant higher scores instantly!</p>
+                
+                <table class="guide-table">
+                    <thead>
+                        <tr>
+                            <th>Operation Type</th>
+                            <th>Dynamic Calculation Formula</th>
+                            <th>Complexity Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Addition & Subtraction</strong></td>
+                            <td><code>(Digits × 2) + (Rows × 2)</code></td>
+                            <td><span style="color:#e63946; font-weight:bold;">Balanced</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Decimal Add & Sub</strong></td>
+                            <td><code>(Digits × 4) + (Rows × 2) + (Decimal Places × 5)</code></td>
+                            <td><span style="color:#ffb300; font-weight:bold;">High Reward</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Multiplication</strong></td>
+                            <td><code>(Digit 1 + Digit 2) × 4</code></td>
+                            <td><span style="color:#10b981; font-weight:bold;">Standard multiplier</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Advanced Division</strong></td>
+                            <td><code>(Dividend Digits + Divisor Digits) × 7</code></td>
+                            <td><span style="color:#9400d3; font-weight:bold;">Maximum Reward 🔥</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Soroban Academy</strong></td>
+                            <td>Pure Training - 0 Coins Awarded</td>
+                            <td><span style="color:#666; font-weight:bold;">Educational Only</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>📝 Practical Live Examples:</h3>
+
+                <div class="example-section">
+                    <h4>1. Addition & Subtraction Example</h4>
+                    <p>If you set: Digits = <code>2</code>, Rows = <code>3</code></p>
+                    <p><strong>Calculation:</strong> (2 × 2) + (3 × 2) = 4 + 6</p>
+                    <p><strong>Points Awarded per Question:</strong> <span style="color:#e63946; font-weight:bold;">10 Coins</span></p>
+                </div>
+
+                <div class="example-section">
+                    <h4>2. Decimal Add & Sub Example</h4>
+                    <p>If you set: Total Digits = <code>3</code>, Decimal Places = <code>1</code>, Rows = <code>3</code></p>
+                    <p><strong>Calculation:</strong> (3 × 4) + (3 × 2) + (1 × 5) = 12 + 6 + 5</p>
+                    <p><strong>Points Awarded per Question:</strong> <span style="color:#ffb300; font-weight:bold;">23 Coins</span></p>
+                </div>
+
+                <div class="example-section">
+                    <h4>3. Multiplication Example</h4>
+                    <p>If you set: First Number = <code>2</code> digits, Second Number = <code>1</code> digit (e.g. 24 × 3)</p>
+                    <p><strong>Calculation:</strong> (2 + 1) × 4 = 3 × 4</p>
+                    <p><strong>Points Awarded per Question:</strong> <span style="color:#10b981; font-weight:bold;">12 Coins</span></p>
+                </div>
+
+                <div class="example-section">
+                    <h4>4. Division Example</h4>
+                    <p>If you set: First Number = <code>3</code> digits, Second Number = <code>1</code> digit (e.g. 125 ÷ 5)</p>
+                    <p><strong>Calculation:</strong> (3 + 1) × 7 = 4 × 7</p>
+                    <p><strong>Points Awarded per Question:</strong> <span style="color:#9400d3; font-weight:bold;">28 Coins 🔥</span></p>
+                </div>
+            </div>
+            <button class="inline-back-btn" onclick="showPage('mainPage')">🔙 Back to Home</button>
+        </div>
+    </div>
+
+    <!-- QUIZ PAGE -->
+    <div class="page" id="quizPage">
+        <div class="quiz-container">
+            <div class="timer-box" id="timerBox" style="display:none;">00:00</div>
+            <div id="quizQuestion"></div>
+            <input type="number" step="any" id="answerInput" class="answer-input" placeholder="Your Answer (Or leave empty to skip)" onkeydown="checkEnterKey(event)">
+            <button class="next-btn" onclick="nextQuestion()">Next</button>
+            <button class="inline-back-btn" style="margin-top:20px;" onclick="if(confirm('Are you sure you want to exit the quiz? progress will be lost.')) { clearInterval(timerInterval); showPage('mainPage'); }">🛑 Exit & Home</button>
+        </div>
+    </div>
+
+    <!-- RESULT PAGE -->
+    <div class="page" id="resultPage">
+        <div class="result-container">
+            <div class="result-text" id="resultText">Score: 0</div>
+            <button class="start-btn" onclick="showPage('mainPage')">Home</button>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD PAGE -->
+    <div class="page" id="leaderboardPage">
+        <div class="container" style="max-width:800px; text-align:center;">
+            <h1 class="title">🏆 Global Leaderboard</h1>
+            <div class="leaderboard-container" id="leaderboardList"></div>
+            <button class="back-btn" onclick="showPage('mainPage')">Back Home</button>
+        </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div class="page" id="profilePage">
+        <div class="profile-wrapper">
+            <div class="profile-card">
+                <div id="profileTrophy" class="rank-trophy-icon">👑</div>
+                <h2 id="profileRankName">Bronze</h2>
+                <div class="profile-progress">
+                    <div id="profileProgressFill" class="profile-progress-fill"></div>
+                </div>
+                <p id="profileNextRank">Loading info...</p>
+                <div class="profile-info-row"><span>🪙 Total Coins</span><span id="profileCoins">0</span></div>
+                <div class="profile-info-row"><span>📊 Global Position</span><span id="profilePosition">#0</span></div>
+                <button class="profile-btn" onclick="showPage('mainPage')">Back Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        /* ================= SOROBAN ENGINE CLASS ================= */
+        class SorobanTutor {
+            constructor() { this.value = 0; }
+            addDirect(number) {
+                if (this.value + number <= 9) { this.value += number; return true; }
+                return false;
+            }
+            subtractDirect(number) {
+                if (this.value >= number) { this.value -= number; return true; }
+                return false;
+            }
+            addSmallFriend(number) {
+                let friend = 5 - number;
+                if (this.value < 5 && (this.value % 5) + number > 4) { this.value = this.value + 5 - friend; return true; }
+                return false;
+            }
+            subtractSmallFriend(number) {
+                let friend = 5 - number;
+                if (this.value >= 5 && (this.value % 5) < number) { this.value = this.value - 5 + friend; return true; }
+                return false;
+            }
+            addBigFriend(number) {
+                let friend = 10 - number;
+                if (this.value + number > 9) { this.value = this.value + 10 - friend; return true; }
+                return false;
+            }
+            subtractBigFriend(number) {
+                let friend = 10 - number;
+                if (this.value < number) { this.value = this.value - 10 + friend; return true; }
+                return false;
+            }
+        }
+
+        /* ================= SUPABASE CONFIG ================= */
+        const SUPABASE_URL = "https://ganrcnmwqfxynghkmfqc.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhbnJjbm13cWZ4eW5naGttZnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzcwMzQsImV4cCI6MjA5NTExMzAzNH0.IDb6E5yCe3aDnieqUbtir11IT541Rz-EPfAcUaBdl40 ";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+        let coins = 0;
+        let quizList = [];
+        let currentQuiz = 0;
+        let currentAnswer = 0;
+        let earnedTotalCoins = 0; 
+        let correctAnswersCount = 0;
+        let timerInterval = null;
+        let remainingTime = 0;
+        let isTrainingMode = false;
+
+        const ranks = [
+            { name: "Bronze", min: 0, max: 299, trophy: "🥉" },
+            { name: "Silver", min: 300, max: 999, trophy: "🥈" },
+            { name: "Gold", min: 1000, max: 2999, trophy: "🥇" },
+            { name: "Diamond", min: 3000, max: 6999, trophy: "💎" },
+            { name: "Master", min: 7000, max: 14999, trophy: "🏆" },
+            { name: "Legend", min: 15000, max: 99999999, trophy: "👑" }
+        ];
+
+        const menuBtn = document.getElementById("menuBtn");
+        const mobileMenu = document.getElementById("mobileMenu");
+        if(menuBtn) { menuBtn.onclick = () => { mobileMenu.classList.toggle("active"); }; }
+
+        window.onload = async () => {
+            const savedUser = localStorage.getItem("savedUser");
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                const { data } = await supabaseClient.from("users").select("*").eq("id", user.id);
+                if (data && data.length > 0) {
+                    currentUser = data[0];
+                    coins = currentUser.coins || 0;
+                    updateCoinsUI();
+                    showPage("mainPage");
+                }
+            }
+        };
+
+        function updateCoinsUI() {
+            document.getElementById("coinsCount").innerHTML = coins;
+            const rank = ranks.find(r => coins >= r.min && coins <= r.max) || ranks[0];
+            document.getElementById("rankName").innerHTML = rank.name;
+            const iconEl = document.getElementById("rankIcon");
+            iconEl.innerHTML = rank.trophy;
+            iconEl.className = "rank-" + rank.name;
+        }
+
+        function checkEnterKey(event) { if (event.key === "Enter") nextQuestion(); }
+
+        /* ================= AUTHENTICATION ================= */
+        async function signup() {
+            const u = document.getElementById("username").value.trim();
+            const p = document.getElementById("password").value.trim();
+            if (!u || !p) return alert("Please fill all fields");
+            const { data } = await supabaseClient.from("users").select("*").eq("username", u);
+            if (data && data.length > 0) return alert("Username already exists!");
+            await supabaseClient.from("users").insert([{ username: u, password: p, coins: 0 }]);
+            alert("Account created successfully! You can login now.");
+        }
+
+        async function login() {
+            const u = document.getElementById("username").value.trim();
+            const p = document.getElementById("password").value.trim();
+            const { data } = await supabaseClient.from("users").select("*").eq("username", u).eq("password", p);
+            if (!data || data.length === 0) return alert("Invalid Username or Password");
+            currentUser = data[0]; coins = currentUser.coins || 0;
+            localStorage.setItem("savedUser", JSON.stringify({ id: currentUser.id }));
+            updateCoinsUI(); showPage("mainPage");
+        }
+
+        function logout() { localStorage.removeItem("savedUser"); currentUser = null; showPage("loginPage"); }
+
+        /* ================= MATHEMATICAL GENERATION ================= */
+        function getRandomWithDigits(digits) {
+            let min = Math.pow(10, digits - 1);
+            let max = Math.pow(10, digits) - 1;
+            let num = Math.floor(Math.random() * (max - min + 1)) + min;
+            return parseInt(num.toString().replace(/0/g, () => Math.floor(Math.random() * 9) + 1));
+        }
+
+        function getRandomDecimalWithDigits(totalDigits, decimalPlaces) {
+            let wholeDigits = totalDigits - decimalPlaces;
+            if (wholeDigits <= 0) wholeDigits = 1;
+            return parseFloat(`${getRandomWithDigits(wholeDigits)}.${getRandomWithDigits(decimalPlaces)}`);
+        }
+
+        function generateAdditionQuestion(digits, rows) {
+            let numbers = [getRandomWithDigits(digits)];
+            let runningSum = numbers[0];
+            let subIdx = Math.floor(Math.random() * (rows - 1)) + 1;
+
+            for (let r = 1; r < rows; r++) {
+                let nextNum = getRandomWithDigits(digits);
+                if (r === subIdx) {
+                    if (nextNum >= runningSum) { runningSum = nextNum + getRandomWithDigits(digits); numbers[0] = runningSum; }
+                    runningSum -= nextNum; numbers.push(-nextNum);
+                } else { runningSum += nextNum; numbers.push(nextNum); }
+            }
+            return { type: "vertical", data: numbers, answer: runningSum, weight: (digits * 2) + (rows * 2), isDecimal: false };
+        }
+
+        function generateDecimalQuestion(totalDigits, decimalPlaces, rows) {
+            let numbers = [getRandomDecimalWithDigits(totalDigits, decimalPlaces)];
+            let runningSum = numbers[0];
+            let subIdx = Math.floor(Math.random() * (rows - 1)) + 1;
+
+            for (let r = 1; r < rows; r++) {
+                let nextNum = getRandomDecimalWithDigits(totalDigits, decimalPlaces);
+                if (r === subIdx) {
+                    if (nextNum >= runningSum) { runningSum = nextNum + getRandomDecimalWithDigits(totalDigits, decimalPlaces); numbers[0] = parseFloat(runningSum.toFixed(decimalPlaces)); }
+                    runningSum -= nextNum; runningSum = parseFloat(runningSum.toFixed(decimalPlaces)); numbers.push(-nextNum);
+                } else { runningSum += nextNum; runningSum = parseFloat(runningSum.toFixed(decimalPlaces)); numbers.push(nextNum); }
+            }
+            let weight = (totalDigits * 4) + (rows * 2) + (decimalPlaces * 5);
+            return { type: "vertical", data: numbers, answer: parseFloat(runningSum.toFixed(decimalPlaces)), weight: weight, isDecimal: true, decimals: decimalPlaces };
+        }
+
+        function generateMultiplicationQuestion(d1, d2) {
+            let n1 = getRandomWithDigits(d1), n2 = getRandomWithDigits(d2);
+            return { type: "horizontal", text: `${n1} × ${n2}`, answer: n1 * n2, weight: (d1 + d2) * 4 };
+        }
+
+        function generateDivisionQuestion(d1, d2) {
+            let divisor = getRandomWithDigits(d2);
+            let targetAns = getRandomWithDigits(d1 - d2 <= 0 ? 1 : d1 - d2);
+            let dividend = divisor * targetAns;
+            if(dividend.toString().includes('0') || dividend.toString().length !== d1) return generateDivisionQuestion(d1, d2);
+            return { type: "horizontal", text: `${dividend} ÷ ${divisor}`, answer: targetAns, weight: (d1 + d2) * 7 };
+        }
+
+        /* ================= SOROBAN GENERATORS ================= */
+        function makeSorobanProblem(mode, maxRows) {
+            let tutor = new SorobanTutor();
+            let steps = [];
+            let start = Math.floor(Math.random() * 4) + 1;
+            tutor.value = start;
+            steps.push(start);
+
+            // Loop continues based on user defined Rows count minus the initial row
+            for(let attempt=0; attempt < (maxRows - 1); attempt++) {
+                let randNum = Math.floor(Math.random() * 4) + 1;
+                let isPlus = Math.random() > 0.4;
+
+                if (mode === 'direct') {
+                    if (isPlus && tutor.addDirect(randNum)) steps.push(randNum);
+                    else if (!isPlus && tutor.subtractDirect(randNum)) steps.push(-randNum);
+                } else if (mode === 'small') {
+                    if (isPlus && tutor.addSmallFriend(randNum)) steps.push(randNum);
+                    else if (!isPlus && tutor.subtractSmallFriend(randNum)) steps.push(-randNum);
+                } else if (mode === 'big') {
+                    let bigRand = Math.floor(Math.random() * 8) + 2;
+                    if (isPlus && tutor.addBigFriend(bigRand)) steps.push(bigRand);
+                    else if (!isPlus && tutor.subtractBigFriend(bigRand)) steps.push(-bigRand);
+                }
+            }
+            if (steps.length < 2) return makeSorobanProblem(mode, maxRows);
+            return { type: "vertical", data: steps, answer: tutor.value, weight: 0, isDecimal: false };
+        }
+
+        /* ================= QUIZ CONTROLLER ================= */
+        function startQuiz(training) {
+            isTrainingMode = training; quizList = []; correctAnswersCount = 0; earnedTotalCoins = 0; currentQuiz = 0;
+
+            const addQuestions = parseInt(document.getElementById("addQuestions").value) || 0;
+            const addDigits = parseInt(document.getElementById("addDigits").value) || 1;
+            const addRows = parseInt(document.getElementById("addRows").value) || 2;
+
+            const decQuestions = parseInt(document.getElementById("decQuestions").value) || 0;
+            const decDigits = parseInt(document.getElementById("decDigits").value) || 3;
+            const decPlaces = parseInt(document.getElementById("decPlaces").value) || 1;
+            const decRows = parseInt(document.getElementById("decRows").value) || 2;
+
+            for (let i = 0; i < addQuestions; i++) quizList.push(generateAdditionQuestion(addDigits, addRows));
+            for (let i = 0; i < decQuestions; i++) quizList.push(generateDecimalQuestion(decDigits, decPlaces, decRows));
+            for (let i = 0; i < (parseInt(document.getElementById("mulQuestions").value) || 0); i++) quizList.push(generateMultiplicationQuestion(parseInt(document.getElementById("mulDigit1").value), parseInt(document.getElementById("mulDigit2").value)));
+            for (let i = 0; i < (parseInt(document.getElementById("divQuestions").value) || 0); i++) quizList.push(generateDivisionQuestion(parseInt(document.getElementById("divDigit1").value), parseInt(document.getElementById("divDigit2").value)));
+
+            if (quizList.length === 0) return alert("Select questions first.");
+            showPage("quizPage"); startTimer(parseFloat(document.getElementById("quizTime").value) || 2); showQuestion();
+        }
+
+        function startSorobanTraining(type) {
+            isTrainingMode = true; quizList = []; correctAnswersCount = 0; earnedTotalCoins = 0; currentQuiz = 0;
+            let count = 5;
+            let rows = 3;
+            
+            if(type === 'direct') {
+                count = parseInt(document.getElementById("sorDirectQuestions").value) || 5;
+                rows = parseInt(document.getElementById("sorDirectRows").value) || 3;
+            }
+            if(type === 'small') {
+                count = parseInt(document.getElementById("sorSmallQuestions").value) || 5;
+                rows = parseInt(document.getElementById("sorSmallRows").value) || 3;
+            }
+            if(type === 'big') {
+                count = parseInt(document.getElementById("sorBigQuestions").value) || 5;
+                rows = parseInt(document.getElementById("sorBigRows").value) || 3;
+            }
+
+            for(let i=0; i<count; i++) { quizList.push(makeSorobanProblem(type, rows)); }
+            showPage("quizPage"); startTimer(3); showQuestion();
+        }
+
+        function showQuestion() {
+            const container = document.getElementById("quizQuestion");
+            const input = document.getElementById("answerInput");
+            input.value = ""; input.focus();
+            if (currentQuiz >= quizList.length) { finishQuiz(); return; }
+
+            let q = quizList[currentQuiz]; currentAnswer = q.answer;
+            if (q.type === "vertical") {
+                let html = '<div class="vertical-question">';
+                q.data.forEach(num => {
+                    let txt = q.isDecimal ? Math.abs(num).toFixed(q.decimals) : Math.abs(num);
+                    html += `<div>${num > 0 ? txt : '- ' + txt}</div>`;
+                });
+                container.innerHTML = html + '</div>';
+            } else { container.innerHTML = `<div class="horizontal-question">${q.text}</div>`; }
+        }
+
+        function nextQuestion() {
+            const input = document.getElementById("answerInput");
+            let q = quizList[currentQuiz];
+            if (input.value.trim() !== "") {
+                const userAns = parseFloat(input.value);
+                let corr = q.isDecimal ? userAns.toFixed(q.decimals) === currentAnswer.toFixed(q.decimals) : userAns === currentAnswer;
+                if (corr) { correctAnswersCount++; if(!isTrainingMode) earnedTotalCoins += q.weight; }
+            }
+            currentQuiz++; showQuestion();
+        }
+
+        async function finishQuiz() {
+            clearInterval(timerInterval); document.getElementById("timerBox").style.display = "none";
+            if(!isTrainingMode) {
+                coins += earnedTotalCoins; updateCoinsUI();
+                if(currentUser) { await supabaseClient.from("users").update({ coins: coins }).eq("id", currentUser.id); }
+            }
+            document.getElementById("resultText").innerHTML = `Quiz Completed!<br>🎯 Score: ${correctAnswersCount}/${quizList.length}<br>` + 
+            (isTrainingMode ? `<span style='color:#666; font-size:20px;'>Academy Mode: +0 Coins</span>` : `🪙 Earned: +${earnedTotalCoins} Coins`);
+            showPage("resultPage");
+        }
+
+        /* ================= TIMER & VIEW CONTROLLERS ================= */
+        function startTimer(min) {
+            remainingTime = Math.ceil(min * 60); const box = document.getElementById("timerBox"); box.style.display = "flex";
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                remainingTime--; box.innerHTML = `${String(Math.floor(remainingTime/60)).padStart(2,"0")}:${String(remainingTime%60).padStart(2,"0")}`;
+                if(remainingTime<=0) { clearInterval(timerInterval); finishQuiz(); }
+            }, 1000);
+        }
+
+        async function openProfile() {
+            showPage("profilePage"); const rank = ranks.find(r => coins >= r.min && coins <= r.max) || ranks[0];
+            document.getElementById("profileTrophy").innerHTML = rank.trophy;
+            document.getElementById("profileRankName").innerHTML = rank.name;
+            document.getElementById("profileCoins").innerHTML = coins;
+            let idx = ranks.indexOf(rank);
+            if(ranks[idx+1]) {
+                document.getElementById("profileNextRank").innerHTML = `🔥 ${ranks[idx+1].min - coins} to ${ranks[idx+1].name}`;
+                document.getElementById("profileProgressFill").style.width = ((coins - rank.min)/(ranks[idx+1].min - rank.min))*100 + "%";
+            } else { document.getElementById("profileNextRank").innerHTML = "MAX RANK"; }
+            const { data } = await supabaseClient.from("users").select("id").order("coins", { ascending: false });
+            if(data) document.getElementById("profilePosition").innerHTML = `#${data.findIndex(p => p.id === currentUser.id) + 1}`;
+        }
+
+        async function openLeaderboard() {
+            showPage("leaderboardPage"); const list = document.getElementById("leaderboardList"); list.innerHTML = "<p>Loading...</p>";
+            const { data } = await supabaseClient.from("users").select("*").order("coins", { ascending: false }).limit(10);
+            let html = "";
+            if(data) data.forEach((p, i) => {
+                let r = ranks.find(rk => p.coins >= rk.min && p.coins <= rk.max) || ranks[0];
+                html += `
+                    <div class="top-player">
+                        <div class="player-identity">
+                            <span class="player-rank">#${i+1}</span>
+                            <span>${r.trophy}</span>
+                            <span class="player-name">${p.username}</span>
+                        </div>
+                        <div class="player-coins">🪙 ${p.coins}</div>
+                    </div>`;
+            });
+            list.innerHTML = html;
+        }
+
+        function showPage(id) {
+            document.querySelectorAll(".page").forEach(p => p.classList.remove("active-page"));
+            if(document.getElementById(id)) document.getElementById(id).classList.add("active-page");
+            if(mobileMenu) mobileMenu.classList.remove("active");
+        }
+    </script>
+</body>
+</html>
