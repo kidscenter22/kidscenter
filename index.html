@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>kids center  </title>
+    <title>kids center</title>
 
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const SUPABASE_URL = "https://ganrcnmwqfxynghkmfqc.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhbnJjbm13cWZ4eW5naGttZnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzcwMzQsImV4cCI6MjA5NTExMzAzNH0.IDb6E5yCe3aDnieqUbtir11IT541Rz-EPfAcUaBdl40 ";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
 
     <style>
         * {
@@ -234,7 +239,7 @@
 
         /* ================= PANELS ================= */
         #mainPage, #sorobanPage, #guidePage { flex-direction: column; align-items: center; }
-        .container { width: 95%; max-width: 1400px; padding-bottom: 60px; }
+        .container { width: 95%; max-width: 1400px; padding-bottom: 60px; position: relative; }
 
         .title {
             text-align: center;
@@ -324,6 +329,53 @@
             transition: 0.3s;
         }
         .inline-back-btn:hover { background: #333; color: white; }
+
+        /* ================= LOCK OVERLAY FOR ACADEMY ================= */
+        .academy-lock-overlay {
+            position: absolute;
+            top: 120px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 120px);
+            background: rgba(244, 247, 246, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 24px;
+        }
+
+        .lock-box {
+            background: white;
+            padding: 35px 50px;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 2px solid #edf2f7;
+            animation: pulse 2s infinite;
+        }
+
+        .lock-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        .lock-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e3c72;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
 
         /* ================= SCORE GUIDE STYLES ================= */
         .guide-box {
@@ -592,12 +644,12 @@
             .horizontal-question { font-size: 40px; }
             .answer-input { height: 55px; font-size: 22px; }
             .top-player { flex-direction: column; gap: 10px; text-align: center; }
+            .academy-lock-overlay { top: 160px; height: calc(100% - 160px); }
         }
     </style>
 </head>
 <body>
 
-    <!-- BACKGROUND NUMBERS -->
     <div class="bg-numbers">
         <span style="left:5%;animation-duration:12s;">1</span>
         <span style="left:18%;animation-duration:15s;">8</span>
@@ -609,7 +661,6 @@
         <span style="left:92%;animation-duration:16s;">6</span>
     </div>
 
-    <!-- LOGIN PAGE -->
     <div class="page active-page" id="loginPage">
         <div class="login-box">
             <h1>WELCOME</h1>
@@ -620,7 +671,6 @@
         </div>
     </div>
 
-    <!-- MAIN PAGE -->
     <div class="page" id="mainPage">
         <nav class="navbar">
             <div class="logo">kidc center</div>
@@ -660,7 +710,6 @@
         <div class="container">
             <h1 class="title">Competition</h1>
             <div class="cards">
-                <!-- 1. Addition & Subtraction -->
                 <div class="card">
                     <h2>Addition & Subtraction</h2>
                     <div class="question">
@@ -677,7 +726,38 @@
                     </div>
                 </div>
 
-                <!-- 2. Decimal Addition & Subtraction -->
+                <div class="card">
+                    <h2>Multiplication</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="mulQuestions" value="0">
+                    </div>
+                    <div class="question">
+                        <p>First Number Digits</p>
+                        <input type="number" id="mulDigit1" value="2">
+                    </div>
+                    <div class="question">
+                        <p>Second Number Digits</p>
+                        <input type="number" id="mulDigit2" value="1">
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Division</h2>
+                    <div class="question">
+                        <p>How Many Questions?</p>
+                        <input type="number" id="divQuestions" value="0">
+                    </div>
+                    <div class="question">
+                        <p>First Number Digits</p>
+                        <input type="number" id="divDigit1" value="2">
+                    </div>
+                    <div class="question">
+                        <p>Second Number Digits</p>
+                        <input type="number" id="divDigit2" value="1">
+                    </div>
+                </div>
+
                 <div class="card">
                     <h2>Decimal Add & Sub</h2>
                     <div class="question">
@@ -697,40 +777,6 @@
                         <input type="number" id="decRows" value="3">
                     </div>
                 </div>
-
-                <!-- 3. Multiplication -->
-                <div class="card">
-                    <h2>Multiplication</h2>
-                    <div class="question">
-                        <p>How Many Questions?</p>
-                        <input type="number" id="mulQuestions" value="0">
-                    </div>
-                    <div class="question">
-                        <p>First Number Digits</p>
-                        <input type="number" id="mulDigit1" value="2">
-                    </div>
-                    <div class="question">
-                        <p>Second Number Digits</p>
-                        <input type="number" id="mulDigit2" value="1">
-                    </div>
-                </div>
-
-                <!-- 4. Division -->
-                <div class="card">
-                    <h2>Division</h2>
-                    <div class="question">
-                        <p>How Many Questions?</p>
-                        <input type="number" id="divQuestions" value="0">
-                    </div>
-                    <div class="question">
-                        <p>First Number Digits</p>
-                        <input type="number" id="divDigit1" value="2">
-                    </div>
-                    <div class="question">
-                        <p>Second Number Digits</p>
-                        <input type="number" id="divDigit2" value="1">
-                    </div>
-                </div>
             </div>
 
             <div class="start-box">
@@ -740,13 +786,18 @@
         </div>
     </div>
 
-    <!-- SOROBAN ACADEMY PAGE -->
     <div class="page" id="sorobanPage">
         <div class="container">
+            <div class="academy-lock-overlay">
+                <div class="lock-box">
+                    <div class="lock-icon">🔒</div>
+                    <div class="lock-text">LOCKED - OPENING SOON</div>
+                </div>
+            </div>
+
             <h1 class="title">🧮 Soroban Academy</h1>
             <p style="text-align:center; color:#666; margin-bottom:30px; font-weight:600;">Training Mode: This page is for practice and does not award coins.</p>
             <div class="cards">
-                <!-- Card 1: Direct Arithmetic -->
                 <div class="card">
                     <h2>Direct Arithmetic</h2>
                     <div class="question">
@@ -760,7 +811,6 @@
                     <button class="next-btn" style="margin-top:20px;" onclick="startSorobanTraining('direct')">Train Direct</button>
                 </div>
 
-                <!-- Card 2: Small Friends -->
                 <div class="card">
                     <h2>Small Friends (Base 5)</h2>
                     <div class="question">
@@ -774,7 +824,6 @@
                     <button class="next-btn" style="margin-top:20px; background:#ff8f00;" onclick="startSorobanTraining('small')">Train Small Friends</button>
                 </div>
 
-                <!-- Card 3: Big Friends -->
                 <div class="card">
                     <h2>Big Friends (Base 10)</h2>
                     <div class="question">
@@ -792,7 +841,6 @@
         </div>
     </div>
 
-    <!-- SCORE GUIDE PAGE -->
     <div class="page" id="guidePage">
         <div class="container" style="max-width:900px;">
             <h1 class="title">📊 Score System Guide</h1>
@@ -871,7 +919,6 @@
         </div>
     </div>
 
-    <!-- QUIZ PAGE -->
     <div class="page" id="quizPage">
         <div class="quiz-container">
             <div class="timer-box" id="timerBox" style="display:none;">00:00</div>
@@ -882,7 +929,6 @@
         </div>
     </div>
 
-    <!-- RESULT PAGE -->
     <div class="page" id="resultPage">
         <div class="result-container">
             <div class="result-text" id="resultText">Score: 0</div>
@@ -890,7 +936,6 @@
         </div>
     </div>
 
-    <!-- LEADERBOARD PAGE -->
     <div class="page" id="leaderboardPage">
         <div class="container" style="max-width:800px; text-align:center;">
             <h1 class="title">🏆 Global Leaderboard</h1>
@@ -899,7 +944,6 @@
         </div>
     </div>
 
-    <!-- PROFILE PAGE -->
     <div class="page" id="profilePage">
         <div class="profile-wrapper">
             <div class="profile-card">
@@ -916,7 +960,6 @@
         </div>
     </div>
 
-    <!-- ================= JAVASCRIPT ================= -->
     <script>
         /* ================= SOROBAN ENGINE CLASS ================= */
         class SorobanTutor {
@@ -951,11 +994,7 @@
             }
         }
 
-        /* ================= SUPABASE CONFIG ================= */
-        const SUPABASE_URL = "https://ganrcnmwqfxynghkmfqc.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhbnJjbm13cWZ4eW5naGttZnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzcwMzQsImV4cCI6MjA5NTExMzAzNH0.IDb6E5yCe3aDnieqUbtir11IT541Rz-EPfAcUaBdl40 ";
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+        /* ================= GAMEPLAY CORE VARIABLES ================= */
         let currentUser = null;
         let coins = 0;
         let quizList = [];
@@ -1094,7 +1133,6 @@
             tutor.value = start;
             steps.push(start);
 
-            // Loop continues based on user defined Rows count minus the initial row
             for(let attempt=0; attempt < (maxRows - 1); attempt++) {
                 let randNum = Math.floor(Math.random() * 4) + 1;
                 let isPlus = Math.random() > 0.4;
