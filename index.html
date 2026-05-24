@@ -10,7 +10,17 @@
     <script>
         const SUPABASE_URL = "https://ganrcnmwqfxynghkmfqc.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhbnJjbm13cWZ4eW5naGttZnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzcwMzQsImV4cCI6MjA5NTExMzAzNH0.IDb6E5yCe3aDnieqUbtir11IT541Rz-EPfAcUaBdl40 ";
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // ربط ذكي يضمن إرسال الـ Headers بشكل صريح لمنع خطأ 401
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            auth: { persistSession: true },
+            global: {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            }
+        });
     </script>
 
     <style>
@@ -61,6 +71,8 @@
             width: 100%;
             min-height: 100vh;
             animation: fade .4s ease-out;
+            position: relative;
+            z-index: 1; /* جعل محتوى الصفحات في طبقة منخفضة */
         }
 
         .active-page {
@@ -77,6 +89,7 @@
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            z-index: 2;
         }
 
         .login-box {
@@ -136,6 +149,7 @@
             border-radius: 20px;
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             display: flex;
@@ -143,6 +157,7 @@
             align-items: center;
             padding: 0 25px;
             position: relative;
+            z-index: 9999 !important; /* قمنا برفع الـ z-index هنا ليكون في المقدمة دائماً */
         }
 
         .logo {
@@ -211,6 +226,7 @@
             flex-direction: column;
             gap: 5px;
             cursor: pointer;
+            z-index: 10001; /* فوق كل شيء لضمان الضغط */
         }
 
         .menu span {
@@ -232,14 +248,14 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
             flex-direction: column;
             gap: 20px;
-            z-index: 100;
+            z-index: 10000 !important; /* لضمان ظهور القائمة فوق الكروت المفتوحة برقم ضخم */
         }
 
         .mobile-menu.active { display: flex; }
 
         /* ================= PANELS ================= */
         #mainPage, #sorobanPage, #guidePage { flex-direction: column; align-items: center; }
-        .container { width: 95%; max-width: 1400px; padding-bottom: 60px; position: relative; }
+        .container { width: 95%; max-width: 1400px; padding-bottom: 60px; position: relative; z-index: 5; }
 
         .title {
             text-align: center;
@@ -633,7 +649,7 @@
         .rank-Legend { color: #9400d3; }
 
         @media(max-width: 768px) {
-            .navbar { width: 95%; padding: 0 10px; height: 70px; margin: 15px auto; }
+            .navbar { width: 95%; padding: 0 15px; height: 70px; margin: 15px auto; }
             .logo { font-size: 18px; }
             .desktop-menu { display: none; }
             .menu { display: flex; }
